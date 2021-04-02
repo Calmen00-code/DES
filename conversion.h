@@ -1,6 +1,6 @@
 #ifndef CONVERSION
 #define CONVERSION
 
-void binaryConversion( int, char * );
+void binaryConversion( int *, int *, int );
 
 #endif

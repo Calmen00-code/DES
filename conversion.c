@@ -1,6 +1,6 @@
+#include <stdio.h>
 #include "conversion.h"
 #include "header.h"
-#include <stdio.h>
 
 void binaryConversion( int *i, int arr[], int num )
 {

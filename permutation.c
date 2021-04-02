@@ -2,9 +2,11 @@
 #include "permutation.h"
 #include "file.h"
 
+void initialPermutation( 
+
 int **getInitialPermutation()
 {
-    int row = 8, col = 8;
+    int row = ROW_IP, col = COL_IP;
     int i;
 
     int **ip = calloc(sizeof(int), row);
@@ -12,5 +14,5 @@ int **getInitialPermutation()
     for ( i = 0; i < row; ++i )
         ip[i] = calloc(sizeof(int), col); 
 
-    read( "ip.txt", ip, row, col );
+    readTable( "ip.txt", ip, row, col );
 }
