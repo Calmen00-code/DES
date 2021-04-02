@@ -1,19 +1,20 @@
 #include "conversion.h"
+#include "header.h"
 #include <stdio.h>
 
-void binaryConversion( int num, char *str )
+void binaryConversion( int *i, int arr[], int num )
 {
-    int i;
-    i = 7;
+    int size, idx;
+    idx = 0;
+    size = IN_BITS;
 
-    while ( i > 0 && num / 2 != 0 )
+    while ( *i < size && num > 0 )
     {
-        if ( num % 2 == 0 )
-            str[i] = '0';
-        else
-            str[i] = '1';
+        idx = *i;
+
+        arr[idx] = num % 2; 
         num /= 2;
-        --i;
+
+        *i = ++idx;
     }
-    str[0] = '0';
 }

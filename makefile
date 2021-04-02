@@ -9,7 +9,7 @@ $(EXEC) : $(OBJ)
 main.o : main.c conversion.h
 	$(CC) $(CFLAGS) -c main.c
 
-conversion.o : conversion.c conversion.h
+conversion.o : conversion.c conversion.h header.h
 	$(CC) $(CFLAGS) -c conversion.c
 
 clean: 
