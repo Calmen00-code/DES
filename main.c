@@ -1,28 +1,24 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "conversion.h"
+#include "header.h"
+#include "file.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    char BLUE[100] = "BLUE";
-    char *str = NULL;
-    int ascii = 0;
-    /* char blue[100] = "blue"; */
+    int *arr = NULL;
+    char cipherFile[STR] = "";
 
-    int i;
-    str = malloc(sizeof(char) * 9);
-
-    for ( i = 0; i < 8; ++i )
-        str[i] = '0';
-    str[8] = '\0';
-    
-    for ( i = 0; BLUE[i] != '\0'; ++i )
+    if ( argc != 2 )
+        printf("To run the program: ./main [*.txt]\n");
+    else
     {
-        ascii = (int)(BLUE[i]);
-        printf("ascii: %d\n", ascii);
-        binaryConversion( ascii, str );
-        printf("%c: %s\n", BLUE[i], str);
-    }
+        arr = calloc(sizeof(int), IN_BITS);
+        strcpy( cipherFile, argv[1] );
+        readNPermute( cipherFile, arr );
 
+        free(arr); arr = NULL;
+    }
     return 0;
 }

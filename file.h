@@ -1,6 +1,6 @@
 #ifndef FILE_H
 #define FILE_H
 
-void read( int**, char[], int, int );
+void readNPermute( char[], int *arr );
 
 #endif
