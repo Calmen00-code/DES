@@ -3,12 +3,13 @@
 #include "conversion.h"
 #include "header.h"
 #include "file.h"
+#include "encrypt.h"
 
 void readNPermute( char fileName[], int *arr )
 {
     FILE *readPtr = NULL;
     char ch;
-    int i, j, ii;
+    int i;
     int ascii;
 
     readPtr = fopen(fileName, "r");
@@ -37,34 +38,8 @@ void readNPermute( char fileName[], int *arr )
             if ( i >= IN_BITS )
             {
                 i = 7;  /* Reset to initial 7 since the bits is finished at 64 bits */
-                j = 7;
-                for ( ii = 0; ii < IN_BITS; ++ii )
-                {
-                    if ( ii == j )
-                    {
-                        printf("%d ", arr[ii]);
-                        j += 8;
-                    }
-                    else
-                        printf("%d", arr[ii]);
-                }
-                printf("\n");
-
                 initialPermutation( arr );
-                printf("\n");
-                j = 7;
-                for ( ii = 0; ii < IN_BITS; ++ii )
-                {
-                    if ( ii == j )
-                    {
-                        printf("%d ", arr[ii]);
-                        j += 8;
-                    }
-                    else
-                        printf("%d", arr[ii]);
-                }
-                printf("\n");
-
+                encrypt( arr );
             }
             ch = fgetc(readPtr);
         }
