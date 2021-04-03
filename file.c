@@ -51,7 +51,7 @@ void readNPermute( char fileName[], int *arr )
                 printf("\n");
 
                 initialPermutation( arr );
-
+                printf("\n");
                 j = 7;
                 for ( ii = 0; ii < IN_BITS; ++ii )
                 {
