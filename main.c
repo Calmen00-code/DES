@@ -8,6 +8,7 @@
 int main(int argc, char *argv[])
 {
     int *arr = NULL;
+    /* int i; , j;*/
     char cipherFile[STR] = "";
 
     if ( argc != 2 )

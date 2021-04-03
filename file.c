@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "permutation.h"
 #include "conversion.h"
 #include "header.h"
 #include "file.h"
@@ -7,7 +8,7 @@ void readNPermute( char fileName[], int *arr )
 {
     FILE *readPtr = NULL;
     char ch;
-    int i;
+    int i, j, ii;
     int ascii;
 
     readPtr = fopen(fileName, "r");
@@ -16,33 +17,85 @@ void readNPermute( char fileName[], int *arr )
         perror("Error while reading file ");
     else
     {
-        ascii = i = 0;
+        ascii = 0;
+        i = 7;  /* First total binary bit will be computed is 7 */
 
+        ch = ' ';
         ch = fgetc(readPtr);
 
-        /* ASSERTION: i = 64 OR file reading reaches the end */
-        while ( i < IN_BITS && ch != EOF )
+        /* ASSERTION: file reading reaches the end */
+        while ( ch != EOF )
         {
             /* ascii is to be converted to binary for encryption */
-            ascii = (int)(fgetc(readPtr));
-            binaryConversion( &i, arr, ascii );
+            ascii = (int)(ch);
+            binaryConversion( i, arr, ascii );
 
-            if ( i == IN_BITS )
+            /* Each character in ascii = 7 bits + 1 '0' bit infront = 8 bits */
+            i += 8;     
+
+            /* Send the current block for permutation and next block to come in */
+            if ( i >= IN_BITS )
             {
-                i = 0;
-                /* Permutation here */
+                i = 7;  /* Reset to initial 7 since the bits is finished at 64 bits */
+                j = 7;
+                for ( ii = 0; ii < IN_BITS; ++ii )
+                {
+                    if ( ii == j )
+                    {
+                        printf("%d ", arr[ii]);
+                        j += 8;
+                    }
+                    else
+                        printf("%d", arr[ii]);
+                }
+                printf("\n");
+
+                initialPermutation( arr );
+
+                j = 7;
+                for ( ii = 0; ii < IN_BITS; ++ii )
+                {
+                    if ( ii == j )
+                    {
+                        printf("%d ", arr[ii]);
+                        j += 8;
+                    }
+                    else
+                        printf("%d", arr[ii]);
+                }
+                printf("\n");
+
             }
             ch = fgetc(readPtr);
         }
-        
         fclose(readPtr); readPtr = NULL;
     }
 }
 
-void readTable( char fileName[], int **table, int row, int col )
+void readTest( char fileName[] )
 {
     FILE *readPtr = NULL;
-    int i, j;
+    char readChar = ' ';
+    
+    readPtr = fopen(fileName, "r");
+    if ( readPtr == NULL )
+        perror("Error while reading file ");
+    else
+    {
+        readChar = fgetc(readPtr); 
+        while ( readChar != EOF )
+        {
+            printf("%c", readChar);
+            readChar = fgetc(readPtr);
+        }
+        fclose(readPtr); readPtr = NULL;
+    }
+}
+
+void readTable( char fileName[], int *table, int row, int col )
+{
+    FILE *readPtr = NULL;
+    int i, j, idx;
     int val = 0;
 
     readPtr = fopen(fileName, "r");
@@ -51,13 +104,17 @@ void readTable( char fileName[], int **table, int row, int col )
         perror("Error while reading file ");
     else
     {
+        idx = 0;
         for ( i = 0; i < row; ++i )
         {
             for ( j = 0; j < col; ++j ) 
             {
                 fscanf(readPtr, "%d ", &val);
-                table[i][j] = val;
+                table[idx] = val;
+                ++idx;
             }
+            fscanf(readPtr, "\n");
         }
+        fclose(readPtr); readPtr = NULL;
     }
 }
