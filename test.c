@@ -16,6 +16,17 @@ void rotateleft( int *arr, int size )
     arr[size-1] = temp2;
 }
 
+void binaryConversion( int i, int arr[], int num )
+{
+    while ( i > 0 )
+    {
+        arr[i] = num % 2; 
+        num /= 2;
+        --i;
+    }
+    arr[i] = 0;
+}
+
 int main()
 {
 /*
@@ -31,10 +42,17 @@ int main()
         printf("%d, ", A[i]);
     printf("\n");
 
-*/  
     int a = 1, b = 1;
     int c = 0, d = 0;
     printf("%d\n", a^d);
     printf("%d\n", b^c);
+*/  
+    int i;
+    int arr[4];
+    binaryConversion( 4, arr, 8 );
+    for ( i = 0; i < 4; ++i )
+        printf("%d", arr[i]);
+    printf("\n");
+    
     return 0;
 }

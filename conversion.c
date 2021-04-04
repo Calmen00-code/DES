@@ -14,3 +14,5 @@ void binaryConversion( int i, int arr[], int num )
     }
     arr[i] = 0;
 }
+
+void decToBin( int num, 
