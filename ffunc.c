@@ -14,7 +14,8 @@ void f_func( int *right, int *roundKey, int *res )
     expansion( right, expansion_res );     /* Expansion 32-bit to 48-bit */
     xor_round( expansion_res, roundKey, xor_res );
     sbox_subs( xor_res, s_res );
-    permutation( s_res );
+    permutation_f( s_res );
+    copyAt( res, s_res, 0, 31 );
 }
 
 /**
@@ -174,6 +175,31 @@ void allocateFileName( char **sboxFileName )
     strcpy(sboxFileName[5], "sbox6.txt" );
     strcpy(sboxFileName[6], "sbox7.txt" );
     strcpy(sboxFileName[7], "sbox8.txt" );
+}
+
+/**
+* IMPORT: Integer array from the result of S-Box Substitution
+* PURPOSE: Permutation of f function using the result from S-Box Substitution
+*/
+void permutation_f( int *s_res )
+{
+    int i;
+    int table[32], *permute_res = NULL;
+    int permuteIdx = 0;
+
+    readTable( "f-permutation.txt", table, 4, 8 ); 
+    permute_res = calloc( sizeof(int*), PROCESS_RESULT_BITS );
+    
+    for ( i = 0; i < PROCESS_RESULT_BITS; ++i )
+    {
+        permuteIdx = table[i] - 1;  /* Table is 1-based while array is 0-based */
+        permute_res[i] = s_res[permuteIdx];
+    }
+
+    for ( i = 0; i < PROCESS_RESULT_BITS; ++i )
+        s_res[i] = permute_res[i];
+
+    free(permute_res); permute_res = NULL;
 }
 
 void free_2d_int( int **arr, int row, int col )

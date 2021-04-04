@@ -10,7 +10,7 @@
 void encrypt( int *arr, int keyLen )
 {
     int i;
-    int left[32], right[32], initialKey[64];
+    int left[32], right[32], newRight[32], initialKey[64];
     int *roundKey = NULL;
     int res[32];
 
@@ -21,12 +21,11 @@ void encrypt( int *arr, int keyLen )
 
     for ( i = 0; i < ENCRYPT_ROUND; ++i )
     {
-        copyAt( right, left, 0, 32 );
         roundKey = generateKey( i, initialKey );
         f_func( right, roundKey, res );
-/*
-        xor_encrypt( left, res );
-*/
+        xor_encrypt( left, res, newRight );
+        copyAt( left, right, 0, 31 );
+        copyAt( right, newRight, 0, 31 );
     }
 }
 
@@ -146,6 +145,13 @@ void rotateleft( int opt, int *arr, int size )
     }
 }
 
+void xor_encrypt( int *left, int *res, int *right )
+{
+    int i;
+    for ( i = 0; i < SPLIT_BITS; ++i )
+        right[i] = left[i]^res[i];
+}
+
 int* getKeyTable( char fileName[], int row, int col, int bits )
 {
     int *arr = calloc(sizeof(int), bits);
@@ -153,9 +159,6 @@ int* getKeyTable( char fileName[], int row, int col, int bits )
     return arr;
 }
     
-/*
-void f_func( int *right, int *key, int *res )
-*/
 void copyAt( int *dest, int *src, int start, int end )
 {
     int i, j;

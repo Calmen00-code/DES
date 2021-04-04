@@ -22,7 +22,5 @@ void free_2d_int( int**, int, int );
 void free_2d_char( char**, int, int );
 void allocateFileName( char** );
 void display2d( int**, int, int );
-/*
-void permutation_f( );
-*/
+void permutation_f( int* );
 #endif
