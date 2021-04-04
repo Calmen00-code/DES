@@ -5,7 +5,7 @@
 #include "file.h"
 #include "encrypt.h"
 
-void readNPermute( char fileName[], int *arr )
+void readNPermute( char fileName[], int *arr, int keyLen )
 {
     FILE *readPtr = NULL;
     char ch;
@@ -39,7 +39,7 @@ void readNPermute( char fileName[], int *arr )
             {
                 i = 7;  /* Reset to initial 7 since the bits is finished at 64 bits */
                 initialPermutation( arr );
-                encrypt( arr );
+                encrypt( arr, keyLen );
             }
             ch = fgetc(readPtr);
         }

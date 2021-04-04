@@ -7,7 +7,7 @@
 #define SINGLE_ROTATION 0
 #define DOUBLE_ROTATION 1
 
-void encrypt( int* );
+void encrypt( int*, int );
 void copyAt( int*, int*, int, int );
 void generateInitialKey( int, int* );
 int* generateKey( int, int* );

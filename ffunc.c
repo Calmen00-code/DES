@@ -1,13 +1,15 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "ffunc.h"
 #include "file.h"
 #include "encrypt.h"    /* Include for display function */
 
-void f_func( int *right, int *finalKey, int *res )
+void f_func( int *right, int *roundKey, int *res )
 {
-    int expansion_res[48];
+    int expansion_res[48], xor_res[48];
 
     expansion( right, expansion_res );     /* Expansion 32-bit to 48-bit */
+    xor_round( expansion_res, roundKey, xor_res );
 
 }
 
@@ -33,4 +35,11 @@ void expansion( int* right, int *expansion_res )
         expansion_res[i] = right[exIdx];
     }
     free(ex_table); ex_table = NULL;
+}
+
+void xor_round( int *expansion_res, int *roundKey, int *xor_res )
+{
+    int i;
+    for ( i = 0; i < EX_BITS; ++i )
+        xor_res[i] = expansion_res[i]^roundKey[i];
 }

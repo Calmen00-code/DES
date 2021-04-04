@@ -7,30 +7,23 @@
 #include "permutation.h"
 #include "ffunc.h"
 
-void encrypt( int *arr )
+void encrypt( int *arr, int keyLen )
 {
     int i;
-    int keyLen;
     int left[32], right[32], initialKey[64];
-    int *finalKey = NULL;
+    int *roundKey = NULL;
     int res[32];
 
     copyAt( left, arr, 0, 31 );
     copyAt( right, arr, 32, 63 );
 
-    keyLen = 0;
-    printf("Key Length: ");
-    scanf("%d", &keyLen);
     generateInitialKey( keyLen, initialKey );
-    printf("Initial: ");
-    display(initialKey, 64);
-    printf("\n\n");
 
     for ( i = 0; i < ENCRYPT_ROUND; ++i )
     {
         copyAt( right, left, 0, 32 );
-        finalKey = generateKey( i, initialKey );
-        f_func( right, finalKey, res );
+        roundKey = generateKey( i, initialKey );
+        f_func( right, roundKey, res );
 /*
         xor_encrypt( left, res );
 */

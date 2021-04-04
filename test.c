@@ -31,10 +31,10 @@ int main()
         printf("%d, ", A[i]);
     printf("\n");
 
-    int a = 3, b = 3;
-    int c = 5, d = 5;
 */  
-    printf("%d\n", 3^5);
-    printf("%d\n", 3^5);
+    int a = 1, b = 1;
+    int c = 0, d = 0;
+    printf("%d\n", a^d);
+    printf("%d\n", b^c);
     return 0;
 }

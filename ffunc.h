@@ -5,8 +5,8 @@
 
 void f_func( int*, int*, int* );
 void expansion( int*, int* );
+void xor_round( int*, int*, int* );
 /*
-void xor_round( );
 void sbox_subs( );
 void permutation_f( );
 */
