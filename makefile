@@ -21,7 +21,7 @@ permutation.o : permutation.c permutation.h file.h header.h encrypt.h
 encrypt.o : encrypt.c header.h encrypt.h file.h permutation.h ffunc.h
 	$(CC) $(CFLAGS) -c encrypt.c
 
-ffunc.o : ffunc.c ffunc.h
+ffunc.o : ffunc.c ffunc.h file.h encrypt.h conversion.h header.h
 	$(CC) $(CFLAGS) -c ffunc.c
 
 clean: 

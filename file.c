@@ -93,3 +93,28 @@ void readTable( char fileName[], int *table, int row, int col )
         fclose(readPtr); readPtr = NULL;
     }
 }
+
+void read2dTable( char fileName[], int **table, int row, int col )
+{
+    FILE *readPtr = NULL;
+    int i, j;
+    int val = 0;
+
+    readPtr = fopen(fileName, "r");
+
+    if ( readPtr == NULL )
+        perror("Error while reading file ");
+    else
+    {
+        for ( i = 0; i < row; ++i )
+        {
+            for ( j = 0; j < col; ++j )
+            {
+                fscanf(readPtr, "%d ", &val);
+                table[i][j] = val;
+            }
+            fscanf(readPtr, "\n");
+        }
+        fclose(readPtr); readPtr = NULL;
+    }
+}

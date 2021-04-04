@@ -16,17 +16,43 @@ void rotateleft( int *arr, int size )
     arr[size-1] = temp2;
 }
 
-void binaryConversion( int i, int arr[], int num )
+void decToBin( int i, int arr[], int num )
 {
-    while ( i > 0 )
+    while ( i >= 0 )
     {
         arr[i] = num % 2; 
         num /= 2;
         --i;
     }
-    arr[i] = 0;
 }
 
+int power( int num, int exp )
+{
+    int i;
+    int total = 1;
+
+    if ( exp == 0 )
+        total = 1;
+    else
+    {
+        for ( i = 0; i < exp; ++i )
+            total *= num;
+    }
+    return total;
+}
+
+int binToDec( int bin[], int size )
+{
+    int i, dec, exp;
+    exp = dec = 0;
+    for ( i = size - 1; i >= 0; --i )
+    {
+        dec += bin[i] * power(2, exp);
+        ++exp;
+    }
+    return dec;
+}
+  
 int main()
 {
 /*
@@ -47,12 +73,8 @@ int main()
     printf("%d\n", a^d);
     printf("%d\n", b^c);
 */  
-    int i;
-    int arr[4];
-    binaryConversion( 4, arr, 8 );
-    for ( i = 0; i < 4; ++i )
-        printf("%d", arr[i]);
+    int bin[4] = { 1, 1, 0, 0 };
+    printf("dec: %d", binToDec( bin, 4 ));
     printf("\n");
-    
     return 0;
 }
