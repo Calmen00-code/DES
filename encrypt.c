@@ -3,13 +3,14 @@
 #include <time.h>
 #include "header.h"
 #include "encrypt.h"
+#include "file.h"
 
 void encrypt( int *arr )
 {
     int i;
     int keyLen;
     int left[32], right[32], initialKey[64];
-    int *finalKey = NULL;
+    /* int *finalKey = NULL; */
     /* int res[32]; */
 
     copyAt( left, arr, 0, 31 );
@@ -19,11 +20,14 @@ void encrypt( int *arr )
     printf("Key Length: ");
     scanf("%d", &keyLen);
     generateInitialKey( keyLen, initialKey );
+    printf("Initial: ");
+    display(initialKey, 64);
+    printf("\n");
 
     for ( i = 0; i < ENCRYPT_ROUND; ++i )
     {
         copyAt( right, left, 0, 32 );
-        finalKey = generateKey( i, initialKey );
+        /*finalKey = */generateKey( i, initialKey );
 /*
         f_func( right, finalKey, res );
         xor_encrypt( left, res );
@@ -76,7 +80,7 @@ void generateInitialKey( int keyLen, int *key )
 /**
 * IMPORT: i (Integer) decides whether the bit 
 *         is single or double rotation
-* EXPORT: initialKey with 64-bits
+* EXPORT: initialKey with 48-bits
 * PURPOSE: Generate key for f function
 */
 int* generateKey( int i, int *initialKey )
@@ -104,9 +108,7 @@ int* generateKey( int i, int *initialKey )
     }
 
     /* Recombined the left and right array together */
-    copyAt(combined, left, 0, 27);
-    copyAt(combined, right, 28, 55);
-
+    mergeArray(combined, left, right, 28, 28);
     pc2_res = pc2_process( combined );
 
     free(pc1_res); pc1_res = NULL;
@@ -161,7 +163,7 @@ int* pc1_process( int *initialKey )
     int i, pcIdx;
     
     pc1_res = calloc(sizeof(int), PC1_BITS);    /* PC1_BITS = 56 bits */
-    pc1_table = getKeyTable( PC1_ROW, PC1_COL, PC1_BITS );
+    pc1_table = getKeyTable( "pc1.txt", PC1_ROW, PC1_COL, PC1_BITS );
 
     pcIdx = 0;
     for( i = 0; i < PC1_BITS; ++i )
@@ -185,7 +187,7 @@ int* pc2_process( int *initialKey )
     int i, pcIdx;
 
     pc2_res = calloc(sizeof(int), PC2_BITS);
-    pc2_table = getKeyTable( PC2_ROW, PC2_COL, PC2_BITS );
+    pc2_table = getKeyTable( "pc2.txt", PC2_ROW, PC2_COL, PC2_BITS );
 
     pcIdx = 0;
     for ( i = 0; i < PC2_BITS; ++i )
@@ -198,11 +200,11 @@ int* pc2_process( int *initialKey )
     return pc2_res;
 }
 
-int* getKeyTable( int row, int col, int bits )
+int* getKeyTable( char fileName[], int row, int col, int bits )
 {
-    int *pc1 = calloc(sizeof(int), bits);
-    readTable( "pc1.txt", pc1, row, col );
-    return pc1;
+    int *arr = calloc(sizeof(int), bits);
+    readTable( fileName, arr, row, col );
+    return arr;
 }
     
 /*
@@ -219,9 +221,33 @@ void copyAt( int *dest, int *src, int start, int end )
     }
 }
 
+void mergeArray( int *product, int *a, int *b, int sizeA, int sizeB )
+{
+    int i, j;
+    for ( i = 0; i < sizeA; ++i )
+        product[i] = a[i];
+
+    j = i;  /* Continue the allocation starting from the last elemen of 'a' */
+
+    for ( i = 0; i < sizeB; ++i )
+    {
+        product[j] = b[i]; 
+        ++j;
+    }
+}
+
 void display( int *displayArr, int flag )
 {
-    int i;
+    int i, j;
+    j = 7;
     for ( i = 0; i < flag; ++i )
-        printf("%d", displayArr[i]);
+    {
+        if ( i == j )
+        {
+            printf("%d ", displayArr[i]);
+            j += 8;
+        }
+        else
+            printf("%d", displayArr[i]);
+    }
 }
