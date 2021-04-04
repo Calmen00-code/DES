@@ -14,7 +14,7 @@ void initialPermutation( int *arr )
 
     arrIP = calloc(sizeof(int), IN_BITS);
     permuteIdx = 0;
-    table = getInitialPermutation();
+    table = getInitialPermutation("ip.txt");
     for( i = 0; i < IN_BITS; ++i )
     {
         permuteIdx = table[i] - 1;  /* Table is 1-64 based while array is 0-63 based */
@@ -28,12 +28,35 @@ void initialPermutation( int *arr )
     free(table); table = NULL;
 }
 
-int* getInitialPermutation()
+void finalPermutation( int *arr )
+{
+    int i;
+    int *table = NULL;
+    int permuteIdx;
+    int *arrIP = NULL;
+
+    arrIP = calloc(sizeof(int), IN_BITS);
+    permuteIdx = 0;
+    table = getInitialPermutation("ip-reverse.txt");
+    for( i = 0; i < IN_BITS; ++i )
+    {
+        permuteIdx = table[i] - 1;  /* Table is 1-64 based while array is 0-63 based */
+        arrIP[i] = arr[permuteIdx];
+    }
+
+    for ( i = 0; i < IN_BITS; ++i )
+        arr[i] = arrIP[i];
+
+    free(arrIP); arrIP = NULL;
+    free(table); table = NULL;
+}
+
+int* getInitialPermutation( char fileName[] )
 {
     int row = ROW_IP, col = COL_IP;
     int *ip = calloc(sizeof(int), IN_BITS);
 
-    readTable( "ip.txt", ip, row, col );
+    readTable( fileName, ip, row, col );
     return ip;
 }
 

@@ -38,7 +38,6 @@ void readNPermute( char fileName[], int *arr, int keyLen )
             if ( i >= IN_BITS )
             {
                 i = 7;  /* Reset to initial 7 since the bits is finished at 64 bits */
-                initialPermutation( arr );
                 encrypt( arr, keyLen );
             }
             ch = fgetc(readPtr);

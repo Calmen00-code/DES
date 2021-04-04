@@ -14,6 +14,8 @@ void encrypt( int *arr, int keyLen )
     int *roundKey = NULL;
     int res[32];
 
+    initialPermutation( arr );
+
     copyAt( left, arr, 0, 31 );
     copyAt( right, arr, 32, 63 );
 
@@ -27,6 +29,8 @@ void encrypt( int *arr, int keyLen )
         copyAt( left, right, 0, 31 );
         copyAt( right, newRight, 0, 31 );
     }
+    mergeArray( arr, left, right, 32, 32 );
+    finalPermutation( arr );
 }
 
 void generateInitialKey( int keyLen, int *key )

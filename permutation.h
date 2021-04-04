@@ -19,7 +19,8 @@ int* getInitialPermutation();
 int** getInverseInitialPermutation();
 int** getExpansionPermutation();
 int** getPermutationFunction();
-void initialPermutation(int *);
+void initialPermutation( int * );
+void finalPermutation( int * );
 int* pc1_process( int* );
 int* pc2_process( int* );
 
