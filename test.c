@@ -18,6 +18,7 @@ void rotateleft( int *arr, int size )
 
 int main()
 {
+/*
     int i, size;
     int A[] = { 1, 0, 0, 1, 1 };
 
@@ -29,6 +30,11 @@ int main()
     for ( i = 0; i < size; ++i )
         printf("%d, ", A[i]);
     printf("\n");
-    
+
+    int a = 3, b = 3;
+    int c = 5, d = 5;
+*/  
+    printf("%d\n", 3^5);
+    printf("%d\n", 3^5);
     return 0;
 }
