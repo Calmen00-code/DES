@@ -9,6 +9,7 @@ void encrypt( int *arr )
     int i;
     int keyLen;
     int left[32], right[32], initialKey[64];
+    int *finalKey = NULL;
     /* int res[32]; */
 
     copyAt( left, arr, 0, 31 );
@@ -22,9 +23,9 @@ void encrypt( int *arr )
     for ( i = 0; i < ENCRYPT_ROUND; ++i )
     {
         copyAt( right, left, 0, 32 );
-        generateKey( i, initialKey );
+        finalKey = generateKey( i, initialKey );
 /*
-        f_func( right, key, res );
+        f_func( right, finalKey, res );
         xor_encrypt( left, res );
 */
     }
@@ -72,35 +73,134 @@ void generateInitialKey( int keyLen, int *key )
     free(initialKey); initialKey = NULL;
 }
 
-void generateKey( int i, int *initialKey )
+/**
+* IMPORT: i (Integer) decides whether the bit 
+*         is single or double rotation
+* EXPORT: initialKey with 64-bits
+* PURPOSE: Generate key for f function
+*/
+int* generateKey( int i, int *initialKey )
 {
-    pc1_process( initialKey );
+    int *pc1_res = NULL, *pc2_res = NULL;
+    int left[28], right[28], combined[56];
 
+    pc1_res = pc1_process( initialKey );    /* Drop bits from 64 (initialKey) to 56 (pc1_res) */
 
-void pc1_process( int *initialKey )
-{
-    int *pc1 = NULL, *pc1_res = NULL;
-    int i, pcIdx;
-    
-    pc1_res = calloc(sizeof(int), KEY_BITS);    /* KEY_BITS = 56 bits */
-    pc1 = getKeyTable();
+    /* Split pc1_res into 2 sub arrays */
+    copyAt( left, pc1_res, 0, 27 );
+    copyAt( right, pc1_res, 28, 55 );
 
-    pcIdx = 0;
-    for( i = 0; i < KEY_BITS; ++i )
+    /* ONE, TWO, NINE, SIXTEEN are single shifted */
+    /* Split 56 bits key to half = 28 bits (each left and right */
+    if ( i == 1 || i == 2 || i == 9 || i == 16 )
     {
-        pcIdx = pc1[i] - 1;  /* Table is 1-56 based while array is 0-55 based */
-        pc1_res[i] = initialKey[permuteIdx];
+        rotateleft( SINGLE_ROTATION, left, 28 ); 
+        rotateleft( SINGLE_ROTATION, right, 28 );
+    }
+    else
+    {
+        rotateleft( DOUBLE_ROTATION, left, 28 );
+        rotateleft( DOUBLE_ROTATION, right, 28 );
     }
 
-    for ( i = 0; i < IN_BITS; ++i )
-        arr[i] = arrIP[i];
+    /* Recombined the left and right array together */
+    copyAt(combined, left, 0, 27);
+    copyAt(combined, right, 28, 55);
+
+    pc2_res = pc2_process( combined );
+
+    free(pc1_res); pc1_res = NULL;
+
+    return pc2_res;
 }
 
-int* getKeyTable()
+/**
+* IMPORT: opt (Integer) decides single or double rotation
+*         arr* is the splitted 56-bits key array with 28 bits (each left & right)
+*
+* PURPOSE: Rotation on the bit of the left or right splitted from 56 bits key
+*/
+void rotateleft( int opt, int *arr, int size )
 {
-    int row = PC1_ROW, col = PC1_COL;
-    int *pc1 = calloc(sizeof(int), KEY_BITS);
+    int i;
+    int temp, temp2, last;
 
+    i = 0;
+    if ( opt == SINGLE_ROTATION )
+    {
+        temp = arr[i];
+
+        for ( i = 0; i < size - 1; ++i )
+            arr[i] = arr[i+1];
+
+        last = size - 1;
+        arr[last] = temp;
+    }
+    else
+    {
+        temp = arr[i];
+        temp2 = arr[i+1];
+
+        for ( i = 0; i < size - 2; ++i )
+            arr[i] = arr[i + 2];
+
+        arr[size - 2] = temp;
+        arr[size - 1] = temp2;
+    }
+}
+
+/**
+* IMPORT: initialKey with 64 bits
+* EXPORT: Result key with 56 bits 
+* PURPOSE: Chops key bit from 64 to 56
+*          (Drop bits: 8, 16, 24, 32, 40, 48, 56, 64)
+*/
+int* pc1_process( int *initialKey )
+{
+    int *pc1_table = NULL, *pc1_res = NULL;
+    int i, pcIdx;
+    
+    pc1_res = calloc(sizeof(int), PC1_BITS);    /* PC1_BITS = 56 bits */
+    pc1_table = getKeyTable( PC1_ROW, PC1_COL, PC1_BITS );
+
+    pcIdx = 0;
+    for( i = 0; i < PC1_BITS; ++i )
+    {
+        pcIdx = pc1_table[i] - 1;  /* Table is 1-56 based while array is 0-55 based */
+        pc1_res[i] = initialKey[pcIdx];
+    }
+    free(pc1_table); pc1_table = NULL;
+
+    return pc1_res;
+}
+
+/**
+* IMPORT: initialKey with 56 bits
+* EXPORT: Result key with 48 bits
+* PURPOSE: Chops down 8 bits from 56 bits key in pc1_process
+*/
+int* pc2_process( int *initialKey )
+{
+    int *pc2_table = NULL, *pc2_res = NULL;
+    int i, pcIdx;
+
+    pc2_res = calloc(sizeof(int), PC2_BITS);
+    pc2_table = getKeyTable( PC2_ROW, PC2_COL, PC2_BITS );
+
+    pcIdx = 0;
+    for ( i = 0; i < PC2_BITS; ++i )
+    {
+        pcIdx = pc2_table[i] - 1; /* Table is 1-based while array is 0-based */
+        pc2_res[i] = initialKey[pcIdx];
+    }
+    free(pc2_table); pc2_table = NULL;
+
+    return pc2_res;
+}
+
+int* getKeyTable( int row, int col, int bits )
+{
+    int *pc1 = calloc(sizeof(int), bits);
     readTable( "pc1.txt", pc1, row, col );
     return pc1;
 }
