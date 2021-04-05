@@ -8,7 +8,7 @@
 int main(int argc, char *argv[])
 {
     int *arr = NULL;
-    int keyLen;
+    char key[STR] = "";
     /* int i; , j;*/
     char cipherFile[STR] = "";
 
@@ -16,12 +16,11 @@ int main(int argc, char *argv[])
         printf("To run the program: ./main [*.txt]\n");
     else
     {
-        keyLen = 0;
-        printf("Key Length: ");
-        scanf("%d", &keyLen);
+        printf("Key: ");
+        scanf("%s", key);
         arr = calloc(sizeof(int), IN_BITS);
         strcpy( cipherFile, argv[1] );
-        readNPermute( cipherFile, arr, keyLen );
+        readNPermute( cipherFile, arr, key );
 
         free(arr); arr = NULL;
     }

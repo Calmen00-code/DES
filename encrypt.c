@@ -1,13 +1,14 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
-#include <time.h>
 #include "header.h"
 #include "encrypt.h"
 #include "file.h"
 #include "permutation.h"
 #include "ffunc.h"
+#include "conversion.h"
 
-void encrypt( int *arr, int keyLen )
+void encrypt( int *arr, char *keyStr )
 {
     int i;
     int left[32], right[32], newRight[32], initialKey[64];
@@ -19,7 +20,11 @@ void encrypt( int *arr, int keyLen )
     copyAt( left, arr, 0, 31 );
     copyAt( right, arr, 32, 63 );
 
-    generateInitialKey( keyLen, initialKey );
+    generateInitialKey( keyStr, initialKey );
+    printf("After:\n");
+    display(initialKey, 64);
+    printf("\n\n");
+    
 
     for ( i = 0; i < ENCRYPT_ROUND; ++i )
     {
@@ -33,17 +38,25 @@ void encrypt( int *arr, int keyLen )
     finalPermutation( arr );
 }
 
-void generateInitialKey( int keyLen, int *key )
+void generateInitialKey( char *keyStr, int *key )
 {
-    int i, ii,diff;
-    int *initialKey; 
-    srand(time(NULL));
+    int i, ii, diff, keyLen;
+    int ascii;
+    int *keyInt; 
 
-    initialKey = calloc(sizeof(int), keyLen);
+    keyLen = strlen(keyStr) * 8;    /* Each character consist of 8 bit */
+    keyInt = calloc(sizeof(int*), keyLen);
 
     /* Generate the initial key using Pseudo Random Number Generator */
-    for ( i = 0; i < keyLen; ++i )
-        initialKey[i] = rand() % 2;
+    i = 7;
+    ii = ascii = 0;
+    while ( keyStr[ii] != '\0' )
+    {
+        ascii = (int)(keyStr[ii]);
+        binaryConversion( i, keyInt, ascii );
+        i += 8;
+        ++ii;
+    }
 
     diff = 0;
     if ( keyLen > IN_BITS )         /* Do Chopping */
@@ -53,13 +66,13 @@ void generateInitialKey( int keyLen, int *key )
         keyLen -= diff;
 
         for ( ii = 0; ii < keyLen; ++ii )
-            key[ii] = initialKey[ii];
+            key[ii] = keyInt[ii];
     }
     else if ( keyLen < IN_BITS )    /* Do Padding */
     {
         /* Assign all the values for key from 0 up to keyLen first */
         for ( i = 0; i < keyLen; ++i )
-            key[i] = initialKey[i];
+            key[i] = keyInt[i];
 
         /* Get the correct key length (64 Bits) */
         diff = IN_BITS - keyLen;
@@ -67,12 +80,12 @@ void generateInitialKey( int keyLen, int *key )
 
         /* Do padding on the rest of the bits */
         for ( ii = i; ii < keyLen; ++ii )
-            key[ii] = rand() % 2;
+            key[ii] = 1;
     }
     else    /* Initial key length = actual key length */
-        copyAt( key, initialKey, 0, 63 );
+        copyAt( key, keyInt, 0, 63 );
 
-    free(initialKey); initialKey = NULL;
+    free(keyInt); keyInt = NULL;
 }
 
 /**

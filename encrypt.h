@@ -9,9 +9,9 @@
 
 #define SPLIT_BITS 32 
 
-void encrypt( int*, int );
+void encrypt( int*, char* );
 void copyAt( int*, int*, int, int );
-void generateInitialKey( int, int* );
+void generateInitialKey( char*, int* );
 int* generateKey( int, int* );
 void rotateleft( int, int*, int );
 int* getKeyTable( char[], int, int, int );

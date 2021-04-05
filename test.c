@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 void rotateleft( int *arr, int size )
 {
@@ -73,8 +74,8 @@ int main()
     printf("%d\n", a^d);
     printf("%d\n", b^c);
 */  
-    int bin[4] = { 1, 1, 0, 0 };
-    printf("dec: %d", binToDec( bin, 4 ));
-    printf("\n");
+    char *str = "first";
+    int num = strlen(str);
+    printf("%d\n", num);
     return 0;
 }
