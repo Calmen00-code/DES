@@ -21,11 +21,7 @@ void encrypt( int *arr, char *keyStr )
     copyAt( right, arr, 32, 63 );
 
     generateInitialKey( keyStr, initialKey );
-    printf("After:\n");
-    display(initialKey, 64);
-    printf("\n\n");
     
-
     for ( i = 0; i < ENCRYPT_ROUND; ++i )
     {
         roundKey = generateKey( i, initialKey );
@@ -35,6 +31,7 @@ void encrypt( int *arr, char *keyStr )
         copyAt( right, newRight, 0, 31 );
     }
     mergeArray( arr, left, right, 32, 32 );
+
     finalPermutation( arr );
 }
 

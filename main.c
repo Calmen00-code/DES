@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-    int *arr = NULL;
+    int *cipherBit = NULL;
     char key[STR] = "";
     /* int i; , j;*/
     char cipherFile[STR] = "";
@@ -18,11 +18,12 @@ int main(int argc, char *argv[])
     {
         printf("Key: ");
         scanf("%s", key);
-        arr = calloc(sizeof(int), IN_BITS);
+        cipherBit = calloc(sizeof(int), IN_BITS);
         strcpy( cipherFile, argv[1] );
-        readNPermute( cipherFile, arr, key );
+        readNPermute( cipherFile, cipherBit, key );
+        
 
-        free(arr); arr = NULL;
+        free(cipherBit); cipherBit = NULL;
     }
     return 0;
 }
