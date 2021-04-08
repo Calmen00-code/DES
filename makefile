@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Werror -Wall -ansi -pedantic -g
-OBJ = main.o conversion.o file.o permutation.o encrypt.o ffunc.o
+CFLAGS = -Werror -Wall -ansi -pedantic -g -Wl,--stack,10485760
+OBJ = main.o conversion.o file.o permutation.o encrypt.o decrypt.o ffunc.o
 EXEC = main
 
 $(EXEC) : $(OBJ)
@@ -23,6 +23,9 @@ encrypt.o : encrypt.c header.h encrypt.h file.h permutation.h ffunc.h conversion
 
 ffunc.o : ffunc.c ffunc.h file.h encrypt.h conversion.h header.h
 	$(CC) $(CFLAGS) -c ffunc.c
+
+decrypt.o : decrypt.c header.h encrypt.h file.h permutation.h ffunc.h conversion.h
+	$(CC) $(CFLAGS) -c decrypt.c
 
 clean: 
 	rm -f $(OBJ) $(EXEC)

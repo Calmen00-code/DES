@@ -1,21 +1,26 @@
 #include <stdio.h>
+#include <string.h>
 #include "permutation.h"
 #include "conversion.h"
 #include "header.h"
 #include "file.h"
 #include "encrypt.h"
 
-void readNPermute( char fileName[], int *arr, char *key )
+void readNEncrypt( char fileName[], int *cipherBit, char *key )
 {
-    FILE *readPtr = NULL;
+    FILE *readPtr = NULL, *writePtr = NULL;
     char ch;
+    char hex[STR] = "";
     int i;
     int ascii;
 
-    readPtr = fopen(fileName, "r");
+    readPtr = fopen( fileName, "r" );
+    writePtr = fopen( "cipher.txt", "w" );
 
     if ( readPtr == NULL )
         perror("Error while reading file ");
+    else if ( writePtr == NULL )
+        perror("Error while writing file ");
     else
     {
         ascii = 0;
@@ -29,7 +34,7 @@ void readNPermute( char fileName[], int *arr, char *key )
         {
             /* ascii is to be converted to binary for encryption */
             ascii = (int)(ch);
-            binaryConversion( i, arr, ascii );
+            binaryConversion( i, cipherBit, ascii );
 
             /* Each character in ascii = 7 bits + 1 '0' bit infront = 8 bits */
             i += 8;     
@@ -38,14 +43,64 @@ void readNPermute( char fileName[], int *arr, char *key )
             if ( i >= IN_BITS )
             {
                 i = 7;  /* Reset to initial 7 since the bits is finished at 64 bits */
-                encrypt( arr, key );
-                printf("After Encrypt: ");
-                display( arr, 64 );
-                printf("\n\n");
+                encrypt( cipherBit, key );
+                binToHex( cipherBit, 64, hex );
+                fprintf( writePtr, "%s", hex );
+                strcpy(hex, "");
             }
             ch = fgetc(readPtr);
         }
         fclose(readPtr); readPtr = NULL;
+        fclose(writePtr); writePtr = NULL;
+    }
+}
+
+void readNDecrypt( char fileName[], int *cipherBit, char *key )
+{
+    FILE *readPtr = NULL, *writePtr = NULL;
+    char ch;
+    char hex[STR] = "";
+    int i;
+    int ascii;
+
+    readPtr = fopen( fileName, "r" );
+    writePtr = fopen( "cipher.txt", "w" );
+
+    if ( readPtr == NULL )
+        perror("Error while reading file ");
+    else if ( writePtr == NULL )
+        perror("Error while writing file ");
+    else
+    {
+        ascii = 0;
+        i = 7;  /* First total binary bit will be computed is 7 */
+
+        ch = ' ';
+        ch = fgetc(readPtr);
+
+        /* ASSERTION: file reading reaches the end */
+        while ( ch != EOF )
+        {
+            /* ascii is to be converted to binary for encryption */
+            ascii = (int)(ch);
+            binaryConversion( i, cipherBit, ascii );
+
+            /* Each character in ascii = 7 bits + 1 '0' bit infront = 8 bits */
+            i += 8;     
+
+            /* Send the current block for permutation and next block to come in */
+            if ( i >= IN_BITS )
+            {
+                i = 7;  /* Reset to initial 7 since the bits is finished at 64 bits */
+                encrypt( cipherBit, key );
+                binToHex( cipherBit, 64, hex );
+                fprintf( writePtr, "%s", hex );
+                strcpy(hex, "");
+            }
+            ch = fgetc(readPtr);
+        }
+        fclose(readPtr); readPtr = NULL;
+        fclose(writePtr); writePtr = NULL;
     }
 }
 

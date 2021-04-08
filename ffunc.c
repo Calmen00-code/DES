@@ -7,12 +7,18 @@
 #include "conversion.h"
 #include "header.h"
 
+/**
+ * IMPORT: right: Right key bits (32-bit) splitted from the cipherBit (64-bit)
+ *         roundKey: 56-bit round key 
+ *
+ * PURPOSE: f-function operation in the feistal network
+ */
 void f_func( int *right, int *roundKey, int *res )
 {
     int expansion_res[48], xor_res[48], s_res[32];
 
-    expansion( right, expansion_res );     /* Expansion 32-bit to 48-bit */
-    xor_round( expansion_res, roundKey, xor_res );
+    expansion( right, expansion_res );              /* Expansion 32-bit to 48-bit */
+    xor_round( expansion_res, roundKey, xor_res );  /* xor_res = expansion_res [XOR] roundKey */
     sbox_subs( xor_res, s_res );
     permutation_f( s_res );
     copyAt( res, s_res, 0, 31 );
@@ -53,22 +59,24 @@ void xor_round( int *expansion_res, int *roundKey, int *xor_res )
         xor_res[i] = expansion_res[i]^roundKey[i];
 }
 
+/**
+ * IMPORT   xor_res: the result after expansion_res [XOR] roundKey (48-bit)
+ *          s_res: Result of S-Box Subsitution (32-bit)
+ */
 void sbox_subs( int *xor_res, int *s_res )
 {
     int i;
     int ii, jj, kk;
-    int **sbox = NULL; /*, *process_res = NULL*/;
-/*
-    process_res = calloc( sizeof(int*), PROCESS_RESULT_BITS );
-*/
+    int **sbox = NULL;  /* 2D representation of xor_res */
+
     /** 
      * There are 8 S-Box in total, each carries 6-bits 
      * Therefore, array of 8 rows and 6 columns are required 
      */
-    sbox = calloc( sizeof(int*), TOTAL_SBOX );  /* Allocating row */
+    sbox = (int**)calloc( TOTAL_SBOX, sizeof(int*) );  /* Allocating row (TOTAL_SBOX = 8) */
 
-    for ( i = 0; i < TOTAL_SBOX; ++i )          /* Allocating column */
-        sbox[i] = calloc( sizeof(int), SBOX_BITS ); 
+    for ( i = 0; i < TOTAL_SBOX; ++i )          /* Allocating column (SBOX_BITS = 6) */
+        sbox[i] = (int*)calloc( SBOX_BITS, sizeof(int) ); 
 
     /* Assigning bits from xor_res into every 8 s-box array */
     kk = 0;
@@ -84,37 +92,47 @@ void sbox_subs( int *xor_res, int *s_res )
     free_2d_int( sbox, TOTAL_SBOX, SBOX_BITS );
 }
 
+/**
+ * IMPORT   sbox: Result of 2D representation from xor_result in ffunc
+ *          process_res: Result after this function was computed
+ *
+ * PURPOSE  Compute each 8 bit block into 4 bit
+ */
 void sbox_process( int **sbox, int *process_res )
 {
     int **table = NULL, **sbox_res = NULL;
-    char **sboxFileName = NULL;
     int i, j, k;
+    /* The file name for every single S process (eg: S1, S2 ... S8) */
+    char **sboxFileName = NULL; 
 
     /* Result will be 8 S-Box with 4 bits each */
-    /* Allocation for the array of the result and filename */
-    sbox_res = calloc( sizeof(int*), TOTAL_SBOX );   
+    /* Allocation for the array of the result and filename (Array of Strings) */
+    sbox_res = (int**)calloc( sizeof(int*), TOTAL_SBOX );   
     sboxFileName = calloc( sizeof(char*), TOTAL_SBOX );
-    for ( i = 0; i < TOTAL_SBOX; ++i )
+    for ( i = 0; i < TOTAL_SBOX; ++i )      /* TOTAL_SBOX = 8 */
     {
-        sbox_res[i] = calloc( sizeof(int), RESULT_BITS );
-        sboxFileName[i] = calloc( sizeof(char), STR );
+        sbox_res[i] = (int*)calloc( sizeof(int), RESULT_BITS );   /* RESULT_BITS = 4 */
+        sboxFileName[i] = calloc( sizeof(char), STR ); 
     }
 
     /* Allocation for the S-Table */
-    table = calloc( sizeof(int*), TABLE_ROW ); 
+    table = calloc( sizeof(int*), TABLE_ROW );  /* TABLE_ROW = 4 */
     for ( i = 0; i < TABLE_ROW; ++i )
-        table[i] = calloc( sizeof(int), TABLE_COL );
+        table[i] = calloc( sizeof(int), TABLE_COL );    /* TABLE_COL = 16 */
             
-    allocateFileName( sboxFileName );
+    allocateFileName( sboxFileName );   /* Store all the file name into this Array of Strings */
 
     /* Computation of converting each 6 bits to 4 bits */
+    /* TOTAL_SBOX = 8 */
+    /* TABLE_ROW = 4, TABLE_COL = 16 */
     for ( i = 0; i < TOTAL_SBOX; ++i )
     {
-        read2dTable( sboxFileName[i], table, TABLE_ROW, TABLE_COL );
+        read2dTable( sboxFileName[i], table, TABLE_ROW, TABLE_COL );    
         box_process( table, sbox[i], sbox_res[i] );
     }
 
     /* Combining sbox_res (4-bit) into a single array (32-bit) */
+    /* TOTAL_SBOX = 8, RESULT_BITS = 4 */
     k = 0;
     for ( i = 0; i < TOTAL_SBOX; ++i )
     {
@@ -124,7 +142,7 @@ void sbox_process( int **sbox, int *process_res )
             ++k;
         }
     }
-    free(table); table = NULL;
+    free_2d_int( table, TABLE_ROW, TABLE_COL );
     free_2d_int( sbox_res, TOTAL_SBOX, RESULT_BITS );
     free_2d_char( sboxFileName, TOTAL_SBOX, STR );
 }
@@ -158,7 +176,7 @@ void box_process( int **table, int *box, int *box_res )
     tableValue = table[tableRow][tableCol];
 
     /* Decimal value of tableValue will be converted to binary of box_res */
-    decToBin( 4, box_res, tableValue );
+    decToBin( 3, box_res, tableValue );
 }
 
 /**
@@ -178,7 +196,7 @@ void allocateFileName( char **sboxFileName )
 }
 
 /**
-* IMPORT: Integer array from the result of S-Box Substitution
+* IMPORT: Integer array from the result of S-Box Substitution (32-bit)
 * PURPOSE: Permutation of f function using the result from S-Box Substitution
 */
 void permutation_f( int *s_res )

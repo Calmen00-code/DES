@@ -1,7 +1,7 @@
 #ifndef HEADER
 #define HEADER
 
-#define STR 100
+#define STR 1000
 #define IN_BITS 64
 
 #ifndef BOOLEAN

@@ -2,13 +2,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include "header.h"
-#include "encrypt.h"
+#include "decrypt.h"
 #include "file.h"
 #include "permutation.h"
 #include "ffunc.h"
 #include "conversion.h"
 
-void encrypt( int *cipherBit, char *keyStr )
+void decrypt( int *cipherBit, char *keyStr )
 {
     int i;
     int left[32], right[32], newRight[32], initialKey[64];

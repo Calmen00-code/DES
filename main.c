@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
         scanf("%s", key);
         cipherBit = calloc(sizeof(int), IN_BITS);
         strcpy( cipherFile, argv[1] );
-        readNPermute( cipherFile, cipherBit, key );
+        readNEncrypt( cipherFile, cipherBit, key );
         
 
         free(cipherBit); cipherBit = NULL;

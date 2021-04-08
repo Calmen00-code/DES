@@ -53,7 +53,36 @@ int power( int num, int exp )
     return total;
 }
 
-void convertHex( char binStr[], char hex[] )
+void binToHex( int *bin, int size, char *hex )
+{
+    int i, j;
+    char hexVal[STR] = "";
+    int flag = 4;   /* Group binary bits into 4 per group */
+    int groupBit[4];
+
+    j = 0;
+    for ( i = 0; i < size; ++i )
+    {
+        /* Everytime when j = 3, we have a group of 4 bits */
+        if ( j == flag - 1 )
+        {
+            groupBit[j] = bin[i];
+            getHex( groupBit, hexVal );
+            /*** TODO: previously, it was strcat ***/
+            /* strcpy( hex, hexVal ); */
+            strcat( hex, hexVal );
+            memset(hexVal, 0, sizeof(char));
+            j = 0;
+        }
+        else
+        {
+            groupBit[j] = bin[i];
+            ++j;
+        }
+    }
+}
+
+void convertHex( char binStr[], char *hex )
 {
     if ( strcmp ( binStr, "0000" ) == 0 )
         strcpy( hex, "0" );
@@ -89,7 +118,7 @@ void convertHex( char binStr[], char hex[] )
         strcpy( hex, "F" );
 }
 
-void getHex( int groupBit[], char hex[] )
+void getHex( int groupBit[], char *hex )
 {
     int i;
     char binStr[100] = "";
@@ -102,31 +131,5 @@ void getHex( int groupBit[], char hex[] )
         sprintf( bitStr, "%d", groupBit[i] );     /* Convert each integer bit to string */
         strcat( binStr, bitStr );                 /* Add bitStr into binStr */
     }
-    printf("binStr: %s\n", binStr);
     convertHex( binStr, hex );
-}
-
-void binToHex( int *bin, int size, char hex[] )
-{
-    int i, j;
-    char hexVal[100] = "";
-    int flag = 4;   /* Group binary bits into 4 per group */
-    int groupBit[4];
-
-    j = 0;
-    for ( i = 0; i < size; ++i )
-    {
-        if ( j == flag - 1 )
-        {
-            groupBit[j] = bin[i];
-            getHex( groupBit, hexVal );
-            strcat( hex, hexVal );
-            j = 0;
-        }
-        else
-        {
-            groupBit[j] = bin[i];
-            ++j;
-        }
-    }
 }
