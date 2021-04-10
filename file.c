@@ -60,11 +60,12 @@ void readNDecrypt( char fileName[], int *cipherBit, char *key )
     FILE *readPtr = NULL, *writePtr = NULL;
     char ch;
     char hex[STR] = "";
-    int i;
+    int bin[64];
+    int i, ii, idx, flag;
     int ascii;
 
     readPtr = fopen( fileName, "r" );
-    writePtr = fopen( "cipher.txt", "w" );
+    writePtr = fopen( "plaintext.txt", "w" );
 
     if ( readPtr == NULL )
         perror("Error while reading file ");
@@ -73,7 +74,8 @@ void readNDecrypt( char fileName[], int *cipherBit, char *key )
     else
     {
         ascii = 0;
-        i = 7;  /* First total binary bit will be computed is 7 */
+        flag = 15;  /* Every 16 hexadecimal characters is 64 bits (0 to 16 array based) = 8 ascii characters */
+        i = 0;
 
         ch = ' ';
         ch = fgetc(readPtr);
@@ -81,22 +83,27 @@ void readNDecrypt( char fileName[], int *cipherBit, char *key )
         /* ASSERTION: file reading reaches the end */
         while ( ch != EOF )
         {
-            /* ascii is to be converted to binary for encryption */
-            ascii = (int)(ch);
-            binaryConversion( i, cipherBit, ascii );
-
-            /* Each character in ascii = 7 bits + 1 '0' bit infront = 8 bits */
-            i += 8;     
-
-            /* Send the current block for permutation and next block to come in */
-            if ( i >= IN_BITS )
+            hex[i] = ch;
+            if ( i == flag )
             {
-                i = 7;  /* Reset to initial 7 since the bits is finished at 64 bits */
-                encrypt( cipherBit, key );
-                binToHex( cipherBit, 64, hex );
-                fprintf( writePtr, "%s", hex );
-                strcpy(hex, "");
+                hexToBin( hex, bin );
+                printf("hex: %s\n", hex);
+                encrypt( bin, key );
+
+                /* Iterate for 8 eights for 8 characters */
+                idx = 8;
+                for ( ii = 0; ii < 8; ++ii )
+                {
+                    /* Convert every 8 bits to ascii because 8 bits represents each character */
+                    ascii = binToDec( bin, idx );     
+                    fprintf( writePtr, "%c", (char)(ascii) );
+                    idx += 8;   /* Get binary for the next 8 bits (next alphabet in ascii) */
+                }
+                i = 0;
+                memset(hex, 0, sizeof(hex));
             }
+            else
+                ++i;
             ch = fgetc(readPtr);
         }
         fclose(readPtr); readPtr = NULL;

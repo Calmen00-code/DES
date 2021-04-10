@@ -133,3 +133,128 @@ void getHex( int groupBit[], char *hex )
     }
     convertHex( binStr, hex );
 }
+
+void hexToBin( char *hex, int *bin )
+{
+    int i, idx;
+
+    idx = 0;
+    for ( i = 0; hex[i] != '\0'; ++i )
+        getBin( hex[i], bin, &idx );
+}
+
+void getBin( char hexVal, int *bin, int *idx )
+{
+    if ( hexVal == '0' )
+    {
+        bin[*idx] = 0; ++*idx;
+        bin[*idx] = 0; ++*idx;
+        bin[*idx] = 0; ++*idx;
+        bin[*idx] = 0; ++*idx;
+    }
+    else if ( hexVal == '1' )
+    {
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+    }
+    else if ( hexVal == '2' )
+    {
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+    }
+    else if ( hexVal == '3' )
+    {
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+    }
+    else if ( hexVal == '4' )
+    {
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+    }
+    else if ( hexVal == '5' )
+    {
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+    }
+    else if ( hexVal == '6' )
+    {
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+    }
+    else if ( hexVal == '7' )
+    {
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+    }
+    else if ( hexVal == '8' )
+    {
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+    }
+    else if ( hexVal == '9' )
+    {
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+    }
+    else if ( hexVal == 'A' )
+    {
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+    }
+    else if ( hexVal == 'B' )
+    {
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+    }
+    else if ( hexVal == 'C' )
+    {
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+    }
+    else if ( hexVal == 'D' )
+    {
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+    }
+    else if ( hexVal == 'E' )
+    {
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 0; ++*idx; 
+    }
+    else
+    {
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+        bin[*idx] = 1; ++*idx; 
+    }
+}

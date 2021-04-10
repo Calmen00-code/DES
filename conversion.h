@@ -8,5 +8,7 @@ int power( int, int );
 void binToHex( int*, int, char* );
 void getHex( int[], char* );
 void convertHex( char[], char* );
+void hexToBin( char*, int* );
+void getBin( char, int*, int* );
 
 #endif
