@@ -17,7 +17,7 @@ void rotateleft( int, int*, int );
 int* getKeyTable( char[], int, int, int );
 void mergeArray( int*, int*, int*, int, int );
 void xor_encrypt( int*, int*, int* );
-/*void decrypt( int* );*/
+void displayTable( int*, int, int, int );
 
 void display( int*, int );
 

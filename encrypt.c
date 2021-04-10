@@ -229,3 +229,20 @@ void display( int *displayArr, int flag )
             printf("%d", displayArr[i]);
     }
 }
+
+void displayTable( int *displayArr, int size, int row, int col )
+{
+    int i, j;
+    j = 0;
+    for ( i = 0; i < size; ++i )
+    {
+        printf("%d ", displayArr[i]);
+        if ( j == col - 1 ) 
+        {
+            printf("\n");
+            j = 0;
+        }
+        else
+            ++j;
+    }
+}
