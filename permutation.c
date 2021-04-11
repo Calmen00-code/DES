@@ -18,7 +18,6 @@ void initialPermutation( int *cipherBit )
     arrIP = calloc(sizeof(int), IN_BITS);
     permuteIdx = 0;
     table = getInitialPermutation("ip.txt");
-    displayTable( table, 64, 8, 8 );
     for( i = 0; i < IN_BITS; ++i )
     {
         permuteIdx = table[i] - 1;  /* Table is 1-64 based while array is 0-63 based */

@@ -12,7 +12,7 @@
 void encrypt( int*, char* );
 void copyAt( int*, int*, int, int );
 void generateInitialKey( char*, int* );
-int* generateKey( int, int* );
+int* generateKey( int, int*, int* );
 void rotateleft( int, int*, int );
 int* getKeyTable( char[], int, int, int );
 void mergeArray( int*, int*, int*, int, int );

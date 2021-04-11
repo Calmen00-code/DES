@@ -38,7 +38,7 @@ void expansion( int* right, int *expansion_res )
 
     ex_table = calloc(sizeof(int), EX_BITS);
     readTable( "expansion.txt", ex_table, 8, 6 );
- 
+
     exIdx = 0;
     for( i = 0; i < EX_BITS; ++i )
     {

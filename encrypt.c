@@ -12,30 +12,40 @@ void encrypt( int *cipherBit, char *keyStr )
 {
     int i;
     int left[32], right[32], newRight[32], initialKey[64];
+    int *pc1_res = NULL, leftKey[28], rightKey[28];
     int *roundKey = NULL;
     int res[32];
 
     generateInitialKey( keyStr, initialKey );   /* Generate binary key bit from keyStr */
+    printf("key: ");
+    display(initialKey, 64);
+    pc1_res = pc1_process( initialKey );        /* Drop bits from 64 (initialKey) to 56 (pc1_res) */
+
+    /* Split 56 bits key to half = 28 bits (each left and right) */
+    copyAt( leftKey, pc1_res, 0, 27 );
+    copyAt( rightKey, pc1_res, 28, 55 );
 
     initialPermutation( cipherBit );            /* Encode every 64-bit in the ciphertext with IP */
 
     /** Divide the permuted cipherBit by halves */
     copyAt( left, cipherBit, 0, 31 );
     copyAt( right, cipherBit, 32, 63 );
-    
+ 
     /* ASSERTION: 16 Rounds of encryption */
-    for ( i = 0; i < ENCRYPT_ROUND; ++i )
+    for ( i = 1; i <= ENCRYPT_ROUND; ++i )
     {
-        roundKey = generateKey( i, initialKey );    /* roundKey returned is 56-bit */
-        f_func( right, roundKey, res );             /* 32-bit right cipherbits */
+        roundKey = generateKey( i, leftKey, rightKey );    /* roundKey returned is 56-bit */
+        f_func( right, roundKey, res );                    /* 32-bit right cipherbits */
         xor_encrypt( left, res, newRight );
-        copyAt( left, right, 0, 31 );               /* Example: R0 = L1 */
-        copyAt( right, newRight, 0, 31 );           /* Example: R1 = f(R0, roundKey) XOR L0 */
+        copyAt( left, right, 0, 31 );                      /* Example: R0 = L1 */
+        copyAt( right, newRight, 0, 31 );                  /* Example: R1 = f(R0, roundKey) XOR L0 */
         free(roundKey); roundKey = NULL;
     }
-    mergeArray( cipherBit, left, right, 32, 32 );
+    mergeArray( cipherBit, right, left, 32, 32 );
+    display( cipherBit, 64 );
 
     finalPermutation( cipherBit );
+    free(pc1_res); pc1_res = NULL;
 }
 
 /**
@@ -100,41 +110,32 @@ void generateInitialKey( char *keyStr, int *key )
 
 /**
 * IMPORT: i (Integer): Decides whether the bit is single or double rotation
-*         initialKey:  Key value (64-bit) from user input will be computed 
-*                      to (56-bit) using permutation (PC-1)
+*         leftKey, rightKey (Array Integer): Keys splitted after PC-1
 * 
 * EXPORT: initialKey with 48-bits
 * PURPOSE: Generate key for f function
 */
-int* generateKey( int i, int *initialKey )
+int* generateKey( int i, int *leftKey, int *rightKey )
 {
-    int *pc1_res = NULL, *pc2_res = NULL;
-    int left[28], right[28], combined[56];
-
-    pc1_res = pc1_process( initialKey );    /* Drop bits from 64 (initialKey) to 56 (pc1_res) */
-
-    /* Split 56 bits key to half = 28 bits (each left and right) */
-    copyAt( left, pc1_res, 0, 27 );
-    copyAt( right, pc1_res, 28, 55 );
+    int *pc2_res = NULL;
+    int combined[56];
 
     /* ONE, TWO, NINE, SIXTEEN are single shifted */
     /* Rotation is performed separately for left and right */
     if ( i == 1 || i == 2 || i == 9 || i == 16 )
     {
-        rotateleft( SINGLE_ROTATION, left, 28 ); 
-        rotateleft( SINGLE_ROTATION, right, 28 );
+        rotateleft( SINGLE_ROTATION, leftKey, 28 ); 
+        rotateleft( SINGLE_ROTATION, rightKey, 28 );
     }
     else
     {
-        rotateleft( DOUBLE_ROTATION, left, 28 );
-        rotateleft( DOUBLE_ROTATION, right, 28 );
+        rotateleft( DOUBLE_ROTATION, leftKey, 28 );
+        rotateleft( DOUBLE_ROTATION, rightKey, 28 );
     }
 
     /* Recombined the left and right array together */
-    mergeArray(combined, left, right, 28, 28);
+    mergeArray(combined, leftKey, rightKey, 28, 28);
     pc2_res = pc2_process( combined );
-
-    free(pc1_res); pc1_res = NULL;
 
     return pc2_res;
 }
@@ -217,17 +218,18 @@ void mergeArray( int *product, int *a, int *b, int sizeA, int sizeB )
 void display( int *displayArr, int flag )
 {
     int i, j;
-    j = 7;
+    j = 7;  
     for ( i = 0; i < flag; ++i )
     {
         if ( i == j )
         {
             printf("%d ", displayArr[i]);
-            j += 8;
+            j += 8;     
         }
         else
             printf("%d", displayArr[i]);
     }
+    printf("\n");
 }
 
 void displayTable( int *displayArr, int size, int row, int col )
