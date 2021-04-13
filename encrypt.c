@@ -23,7 +23,6 @@ void encrypt( int *cipherBit, char *keyStr )
     copyAt( right, cipherBit, 32, 63 );
 
     roundKey = generateKey( keyStr );
-    /* display2d( roundKey, 16, 48 ); */
  
     /* ASSERTION: 16 Rounds of encryption */
     for ( i = 1; i <= ENCRYPT_ROUND; ++i )
@@ -34,7 +33,6 @@ void encrypt( int *cipherBit, char *keyStr )
         copyAt( right, newRight, 0, 31 );       /* Example: R1 = f(R0, roundKey) XOR L0 */
     }
     mergeArray( cipherBit, right, left, 32, 32 );
-    /*display( cipherBit, 64 );*/
     finalPermutation( cipherBit );
 
     free_2d_int(roundKey, 16, 48); roundKey = NULL;
@@ -56,7 +54,6 @@ void decrypt( int *cipherBit, char *keyStr )
     copyAt( right, cipherBit, 32, 63 );
 
     roundKey = generateKey( keyStr );
-    /* display2d( roundKey, 16, 48 ); */
  
     idx = ENCRYPT_ROUND - 1;
     /* ASSERTION: 16 Rounds of encryption */
@@ -69,7 +66,6 @@ void decrypt( int *cipherBit, char *keyStr )
         --idx;
     }
     mergeArray( cipherBit, right, left, 32, 32 );
-    /*display( cipherBit, 64 );*/
     finalPermutation( cipherBit );
 
     free_2d_int(roundKey, 16, 48); roundKey = NULL;
@@ -156,8 +152,6 @@ int** generateKey( char keyStr[] )
         roundKey[i] = (int*)calloc(sizeof(int), key_bits);
      
     generateInitialKey( keyStr, initialKey );   /* Generate binary key bit from keyStr */
-    printf("key: ");
-    display(initialKey, 64);
     pc1_res = pc1_process( initialKey );        /* Drop bits from 64 (initialKey) to 56 (pc1_res) */
 
     /* Split 56 bits key to half = 28 bits (each left and right) */
@@ -179,8 +173,6 @@ int** generateKey( char keyStr[] )
             rotateleft( DOUBLE_ROTATION, leftKey, 28 );
             rotateleft( DOUBLE_ROTATION, rightKey, 28 );
         }
-
-        display( leftKey, 28 );
 
         /* Recombined the left and right array together */
         mergeArray(combined, leftKey, rightKey, 28, 28);

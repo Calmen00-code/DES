@@ -45,8 +45,6 @@ void readNEncrypt( char fileName[], int *cipherBit, char *key )
                 i = 7;  /* Reset to initial 7 since the bits is finished at 64 bits */
                 encrypt( cipherBit, key );
                 binToHex( cipherBit, 64, hex );
-                printf("Encrypt Result: ");
-                display( cipherBit, 64 );
                 fprintf( writePtr, "%s", hex );
                 strcpy(hex, "");
             }
@@ -90,10 +88,7 @@ void readNDecrypt( char fileName[], int *cipherBit, char *key )
             if ( i == flag )
             {
                 hexToBin( hex, bin );
-                printf("hex: %s\n", hex);
                 decrypt( bin, key );
-                printf("Decrypt Result: ");
-                display(bin, 64);
 
                 /* Iterate for 8 binary bits for 1 ascii character */
                 ii = 0;
