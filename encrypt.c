@@ -178,6 +178,7 @@ int** generateKey( char keyStr[] )
         mergeArray(combined, leftKey, rightKey, 28, 28);
         pc2_process( combined, roundKey[i-1] );
     }
+    free(pc1_res); pc1_res = NULL;
     return roundKey;
 }
 

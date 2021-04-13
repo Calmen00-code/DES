@@ -68,10 +68,8 @@ void binToHex( int *bin, int size, char *hex )
         {
             groupBit[j] = bin[i];
             getHex( groupBit, hexVal );
-            /*** TODO: previously, it was strcat ***/
-            /* strcpy( hex, hexVal ); */
             strcat( hex, hexVal );
-            memset(hexVal, 0, sizeof(char));
+            memset(hexVal, 0, sizeof(hexVal));
             j = 0;
         }
         else

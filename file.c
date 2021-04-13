@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "permutation.h"
 #include "conversion.h"
@@ -11,8 +12,9 @@ void readNEncrypt( char fileName[], int *cipherBit, char *key )
     FILE *readPtr = NULL, *writePtr = NULL;
     char ch;
     char hex[STR] = "";
-    int i;
-    int ascii;
+    char str[STR] = "";
+    int after_cipher[8];
+    int i, ii, idx;
 
     readPtr = fopen( fileName, "r" );
     writePtr = fopen( "cipher.txt", "w" );
@@ -23,8 +25,8 @@ void readNEncrypt( char fileName[], int *cipherBit, char *key )
         perror("Error while writing file ");
     else
     {
-        ascii = 0;
         i = 7;  /* First total binary bit will be computed is 7 */
+        idx = 0;
 
         ch = ' ';
         ch = fgetc(readPtr);
@@ -32,9 +34,8 @@ void readNEncrypt( char fileName[], int *cipherBit, char *key )
         /* ASSERTION: file reading reaches the end */
         while ( ch != EOF )
         {
-            /* ascii is to be converted to binary for encryption */
-            ascii = (int)(ch);
-            binaryConversion( i, cipherBit, ascii );
+            str[idx] = ch;
+            binaryConversion( i, cipherBit, (int)str[idx] );
 
             /* Each character in ascii = 7 bits + 1 '0' bit infront = 8 bits */
             i += 8;     
@@ -46,9 +47,26 @@ void readNEncrypt( char fileName[], int *cipherBit, char *key )
                 encrypt( cipherBit, key );
                 binToHex( cipherBit, 64, hex );
                 fprintf( writePtr, "%s", hex );
-                strcpy(hex, "");
+                memset(hex, 0, sizeof(hex));
+                memset(str, 0, sizeof(str));
+                idx = 0;
             }
+            else
+                ++idx;
             ch = fgetc(readPtr);
+        }
+
+        /* Check if there are character in the buffer left that is not being encrypted */
+        /* No encryption can be done as DES takes in 64 bits */
+        if ( strcmp( str, "" ) != 0 )
+        {
+            for ( ii = 0; str[ii] != '\0'; ++ii )
+            {
+                decToBin( 7, after_cipher, (int)str[ii] );
+                binToHex( after_cipher, 8, hex );
+                fprintf( writePtr, "%s", hex );
+                memset(hex, 0, sizeof(hex));
+            }
         }
         fclose(readPtr); readPtr = NULL;
         fclose(writePtr); writePtr = NULL;
@@ -63,6 +81,7 @@ void readNDecrypt( char fileName[], int *cipherBit, char *key )
     int bin[64], charBin[8];
     int i, ii, jj, flag;
     int ascii;
+    int *after_decrypt = NULL, char_bit[8];
 
     readPtr = fopen( fileName, "r" );
     writePtr = fopen( "plaintext.txt", "w" );
@@ -99,8 +118,6 @@ void readNDecrypt( char fileName[], int *cipherBit, char *key )
                         charBin[jj] = bin[ii];
                         ++ii;
                     }
-                    /*display(charBin, 8);*/
-                    /* Convert every 8 bits to ascii because 8 bits represents each character */
                     ascii = binToDec( charBin, 8 );     
                     fprintf( writePtr, "%c", (char)(ascii) );
                 }
@@ -111,9 +128,34 @@ void readNDecrypt( char fileName[], int *cipherBit, char *key )
                 ++i;
             ch = fgetc(readPtr);
         }
+
+        /* Check if there are character in the buffer left that is not being decrypted */
+        if ( strcmp( hex, "" ) != 0 )
+        {
+            /* Each bit of hexa is equivalent to 4 bits of binary */
+            after_decrypt = (int*)calloc(sizeof(int), strlen(hex) * 4);
+            hexToBin( hex, after_decrypt );
+
+            /* Iterate for after_decrypt size */
+            ii = 0; 
+            while( ii < strlen(hex) * 4 ) 
+            {
+                /* Copy every 8 bits from after_decrypt */
+                jj = 0;
+                while ( jj < 8 )
+                {
+                    char_bit[jj] = after_decrypt[ii];
+                    ++ii;
+                    ++jj;
+                }
+                ascii = binToDec( char_bit, 8 );
+                fprintf( writePtr, "%c", ascii );
+            }
+        }
         fclose(readPtr); readPtr = NULL;
         fclose(writePtr); writePtr = NULL;
     }
+    free(after_decrypt); after_decrypt = NULL;
 }
 
 void readTest( char fileName[] )
