@@ -248,16 +248,20 @@ void display2d( int **displayArr, int row, int col )
 {
     int i, j, k;
 
-    k = 5;
+    k = 7;
     for ( i = 0; i < row; ++i )
     {
         for ( j = 0; j < col; ++j )
         {
             if ( j == k )
+            {
                 printf("%d ", displayArr[i][j]);
+                k += 8;
+            }
             else
                 printf("%d", displayArr[i][j]);
         }
-        k = 5;
+        k = 7;
+        printf("\n");
     }
 }

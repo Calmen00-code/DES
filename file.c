@@ -91,7 +91,7 @@ void readNDecrypt( char fileName[], int *cipherBit, char *key )
             {
                 hexToBin( hex, bin );
                 printf("hex: %s\n", hex);
-                encrypt( bin, key );
+                decrypt( bin, key );
                 printf("Decrypt Result: ");
                 display(bin, 64);
 

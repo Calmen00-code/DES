@@ -11,41 +11,68 @@
 void encrypt( int *cipherBit, char *keyStr )
 {
     int i;
-    int left[32], right[32], newRight[32], initialKey[64];
-    int *pc1_res = NULL, leftKey[28], rightKey[28];
-    int *roundKey = NULL;
+    int left[32], right[32], newRight[32];
+    int **roundKey = NULL;
     int res[32];
 
-    generateInitialKey( keyStr, initialKey );   /* Generate binary key bit from keyStr */
-    printf("key: ");
-    display(initialKey, 64);
-    pc1_res = pc1_process( initialKey );        /* Drop bits from 64 (initialKey) to 56 (pc1_res) */
-
-    /* Split 56 bits key to half = 28 bits (each left and right) */
-    copyAt( leftKey, pc1_res, 0, 27 );
-    copyAt( rightKey, pc1_res, 28, 55 );
-
-    initialPermutation( cipherBit );            /* Encode every 64-bit in the ciphertext with IP */
+    /* Encode every 64-bit in the ciphertext with IP */
+    initialPermutation( cipherBit );            
 
     /** Divide the permuted cipherBit by halves */
     copyAt( left, cipherBit, 0, 31 );
     copyAt( right, cipherBit, 32, 63 );
+
+    roundKey = generateKey( keyStr );
+    /* display2d( roundKey, 16, 48 ); */
  
     /* ASSERTION: 16 Rounds of encryption */
     for ( i = 1; i <= ENCRYPT_ROUND; ++i )
     {
-        roundKey = generateKey( i, leftKey, rightKey );    /* roundKey returned is 56-bit */
-        f_func( right, roundKey, res );                    /* 32-bit right cipherbits */
+        f_func( right, roundKey[i-1], res );    /* 32-bit right cipherbits */
         xor_encrypt( left, res, newRight );
-        copyAt( left, right, 0, 31 );                      /* Example: R0 = L1 */
-        copyAt( right, newRight, 0, 31 );                  /* Example: R1 = f(R0, roundKey) XOR L0 */
-        free(roundKey); roundKey = NULL;
+        copyAt( left, right, 0, 31 );           /* Example: R0 = L1 */
+        copyAt( right, newRight, 0, 31 );       /* Example: R1 = f(R0, roundKey) XOR L0 */
     }
     mergeArray( cipherBit, right, left, 32, 32 );
-    display( cipherBit, 64 );
-
+    /*display( cipherBit, 64 );*/
     finalPermutation( cipherBit );
-    free(pc1_res); pc1_res = NULL;
+
+    free_2d_int(roundKey, 16, 48); roundKey = NULL;
+}
+
+void decrypt( int *cipherBit, char *keyStr )
+{
+    int i;
+    int left[32], right[32], newRight[32];
+    int **roundKey = NULL;
+    int res[32];
+    int idx;
+
+    /* Encode every 64-bit in the ciphertext with IP */
+    initialPermutation( cipherBit );            
+
+    /** Divide the permuted cipherBit by halves */
+    copyAt( left, cipherBit, 0, 31 );
+    copyAt( right, cipherBit, 32, 63 );
+
+    roundKey = generateKey( keyStr );
+    /* display2d( roundKey, 16, 48 ); */
+ 
+    idx = ENCRYPT_ROUND - 1;
+    /* ASSERTION: 16 Rounds of encryption */
+    for ( i = 1; i <= ENCRYPT_ROUND; ++i )
+    {
+        f_func( right, roundKey[idx], res );    /* 32-bit right cipherbits */
+        xor_encrypt( left, res, newRight );
+        copyAt( left, right, 0, 31 );           /* Example: R0 = L1 */
+        copyAt( right, newRight, 0, 31 );       /* Example: R1 = f(R0, roundKey) XOR L0 */
+        --idx;
+    }
+    mergeArray( cipherBit, right, left, 32, 32 );
+    /*display( cipherBit, 64 );*/
+    finalPermutation( cipherBit );
+
+    free_2d_int(roundKey, 16, 48); roundKey = NULL;
 }
 
 /**
@@ -73,7 +100,7 @@ void generateInitialKey( char *keyStr, int *key )
     while ( keyStr[ii] != '\0' )
     {
         ascii = (int)(keyStr[ii]);
-        binaryConversion( i, keyInt, ascii );   /* i will be decrement for 8 times */
+        binaryConversion( i, keyInt, ascii );   /* i will be decrement for 8 times in the function */
         i += 8;                                 /* Get the next last index after 8 bits being added */
         ++ii;
     }
@@ -109,35 +136,57 @@ void generateInitialKey( char *keyStr, int *key )
 }
 
 /**
-* IMPORT: i (Integer): Decides whether the bit is single or double rotation
-*         leftKey, rightKey (Array Integer): Keys splitted after PC-1
-* 
-* EXPORT: initialKey with 48-bits
+* IMPORT: keyStr (Key input by user in string) 
+*
+* EXPORT: An array of keys for 16 rounds
 * PURPOSE: Generate key for f function
 */
-int* generateKey( int i, int *leftKey, int *rightKey )
+int** generateKey( char keyStr[] )
 {
-    int *pc2_res = NULL;
-    int combined[56];
+    int i, rounds;
+    int initialKey[64], combined[56], leftKey[28], rightKey[28];
+    int *pc1_res = NULL;
+    int **roundKey = NULL, key_bits;
 
-    /* ONE, TWO, NINE, SIXTEEN are single shifted */
-    /* Rotation is performed separately for left and right */
-    if ( i == 1 || i == 2 || i == 9 || i == 16 )
+    /* Allocation of memory for the round keys */
+    rounds = 16; 
+    key_bits = 48;
+    roundKey = (int**)calloc(sizeof(int*), rounds);
+    for ( i = 0; i < rounds; ++i )
+        roundKey[i] = (int*)calloc(sizeof(int), key_bits);
+     
+    generateInitialKey( keyStr, initialKey );   /* Generate binary key bit from keyStr */
+    printf("key: ");
+    display(initialKey, 64);
+    pc1_res = pc1_process( initialKey );        /* Drop bits from 64 (initialKey) to 56 (pc1_res) */
+
+    /* Split 56 bits key to half = 28 bits (each left and right) */
+    copyAt( leftKey, pc1_res, 0, 27 );
+    copyAt( rightKey, pc1_res, 28, 55 );
+
+    /* Generate the key using the splitted left and right key */
+    for ( i = 1; i <= rounds; ++i )
     {
-        rotateleft( SINGLE_ROTATION, leftKey, 28 ); 
-        rotateleft( SINGLE_ROTATION, rightKey, 28 );
-    }
-    else
-    {
-        rotateleft( DOUBLE_ROTATION, leftKey, 28 );
-        rotateleft( DOUBLE_ROTATION, rightKey, 28 );
-    }
+        /* ONE, TWO, NINE, SIXTEEN are single shifted */
+        /* Rotation is performed separately for left and right */
+        if ( i == 1 || i == 2 || i == 9 || i == 16 )
+        {
+            rotateleft( SINGLE_ROTATION, leftKey, 28 ); 
+            rotateleft( SINGLE_ROTATION, rightKey, 28 );
+        }
+        else
+        {
+            rotateleft( DOUBLE_ROTATION, leftKey, 28 );
+            rotateleft( DOUBLE_ROTATION, rightKey, 28 );
+        }
 
-    /* Recombined the left and right array together */
-    mergeArray(combined, leftKey, rightKey, 28, 28);
-    pc2_res = pc2_process( combined );
+        display( leftKey, 28 );
 
-    return pc2_res;
+        /* Recombined the left and right array together */
+        mergeArray(combined, leftKey, rightKey, 28, 28);
+        pc2_process( combined, roundKey[i-1] );
+    }
+    return roundKey;
 }
 
 /**

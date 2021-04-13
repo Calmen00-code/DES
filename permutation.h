@@ -22,6 +22,6 @@ int** getPermutationFunction();
 void initialPermutation( int* );
 void finalPermutation( int* );
 int* pc1_process( int* );
-int* pc2_process( int* );
+void pc2_process( int*, int* );
 
 #endif

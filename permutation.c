@@ -92,25 +92,22 @@ int* pc1_process( int *initialKey )
 }
 
 /**
-* IMPORT: key_pc1 with 56 bits
-* EXPORT: Result key with 48 bits
+* IMPORT: key_pc1 with 56 bits, round_key with 48 bits
+* EXPORT: Result key with 48 bits is stored in round_key
 * PURPOSE: Chops down 8 bits from 56 bits key from pc1_process
 */
-int* pc2_process( int *key_pc1 )
+void pc2_process( int *key_pc1, int *round_key )
 {
-    int *pc2_table = NULL, *pc2_res = NULL;
+    int *pc2_table = NULL;
     int i, pcIdx;
 
-    pc2_res = calloc(sizeof(int), PC2_BITS);
     pc2_table = getKeyTable( "pc2.txt", PC2_ROW, PC2_COL, PC2_BITS );
 
     pcIdx = 0;
     for ( i = 0; i < PC2_BITS; ++i )
     {
         pcIdx = pc2_table[i] - 1; /* Table is 1-based while array is 0-based */
-        pc2_res[i] = key_pc1[pcIdx];
+        round_key[i] = key_pc1[pcIdx];
     }
     free(pc2_table); pc2_table = NULL;
-
-    return pc2_res;
 }
